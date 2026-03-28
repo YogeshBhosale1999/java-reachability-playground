@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  sonarcloud:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -20,18 +20,11 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+          cache: maven
 
-      - name: SonarCloud Scan
-        uses: sonarsource/sonarqube-scan-action@v2
-        with:
-          args: >
-            -Dsonar.projectKey=YogeshBhosale1999_java-reachability-playground
-            -Dsonar.organization=yogeshbhosale1999
-            -Dsonar.sources=.
-            -Dsonar.host.url=https://sonarcloud.io
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
-
-      - name: SonarCloud Quality Gate
-        uses: sonarsource/sonarqube-quality-gate-action@v1
-        with:
-          sonar_token: ${{ secrets.SONAR_TOKEN }}
+      - name: Build and SonarCloud Scan
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+          -Dsonar.projectKey=YogeshBhosale1999_java-reachability-playground \
+          -Dsonar.organization=yogeshbhosale1999 \
+          -Dsonar.host.url=https://sonarcloud.io \
+          -Dsonar.token=${{ secrets.SONAR_TOKEN }}
